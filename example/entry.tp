@@ -1,0 +1,374 @@
+{
+    "sdk":1,
+    "version":3,
+    "name":"StreamHelper Plugin",
+    "id":"aodshplug_001",
+    "configuration": {
+        "colorDark": "#5d0000",
+        "colorLight": "#e30000"
+    },
+    "categories":[{
+        "id":"aodshplug_001_001",
+        "name":"AoD's StreamHelper",
+        "imagepath":"%TP_PLUGIN_FOLDER%StreamHelperTouchPortalPlugin/images/StreamHelperIcon.png",
+        "actions":[
+            {
+                "id":"aodshplug_act_musicplay",
+                "name":"Play Music",
+                "prefix":"StreamHelper",
+                "type":"communicate",
+                "description":"Start playing music"
+            },
+            {
+                "id":"aodshplug_act_musicstop",
+                "name":"Stop Music",
+                "prefix":"StreamHelper",
+                "type":"communicate",
+                "description":"Stop playing music"
+            },
+            {
+                "id":"aodshplug_act_musicnext",
+                "name":"Next Track",
+                "prefix":"StreamHelper",
+                "type":"communicate",
+                "description":"Skip to the next music track (starts playing if we are not already playing)"
+            },
+            {
+                "id":"aodshplug_act_musicfavourite",
+                "name":"Add Favourite",
+                "prefix":"StreamHelper",
+                "type":"communicate",
+                "description":"Add the current track to the favourites list"
+            },
+            {
+                "id":"aodshplug_act_removetrack",
+                "name":"Remove Track",
+                "prefix":"StreamHelper",
+                "type":"communicate",
+                "description":"Remove the current track from 'All Songs' and skip to the next track"
+            },
+            {
+                "id":"aodshplug_act_selectplaylist",
+                "name":"Select Playlist",
+                "prefix":"StreamHelper",
+                "type":"communicate",
+                "format":"Select playlist {$aodshplug_001.aodshplug_act_selectplaylist.playlistname$}",
+                "tryInline":true,
+                "data": [
+                    {
+                        "id":"aodshplug_001.aodshplug_act_selectplaylist.playlistname",
+                        "type":"choice",
+                        "label":"Playlist Name",
+                        "default":"",
+                        "valueChoices":[]
+                    }
+                ]
+            },
+            {
+                "id":"aodshplug_act_enablerequestmixin",
+                "name":"Enable Track Request Mix In",
+                "prefix":"StreamHelper",
+                "type":"communicate",
+                "description":"Enable requested track mix in"
+            },
+            {
+                "id":"aodshplug_act_disablerequestmixin",
+                "name":"Disable Track Request Mix In",
+                "prefix":"StreamHelper",
+                "type":"communicate",
+                "description":"Disable requested track mix in"
+            },
+            {
+                "id":"aodshplug_act_prevplaylist",
+                "name":"Previous Playlist",
+                "prefix":"StreamHelper",
+                "type":"communicate",
+                "description":"Move to the previous playlist"
+            },
+            {
+                "id":"aodshplug_act_nextplaylist",
+                "name":"Next Playlist",
+                "prefix":"StreamHelper",
+                "type":"communicate",
+                "description":"Move to the next playlist"
+            },
+            {
+                "id":"aodshplug_act_shownowplaying",
+                "name":"Show 'Now Playing'",
+                "prefix":"StreamHelper",
+                "type":"communicate",
+                "description":"Show 'Now Playing' on the stream overlays"
+            },
+            {
+                "id":"aodshplug_act_goaway",
+                "name":"Go Away",
+                "prefix":"StreamHelper",
+                "type":"communicate",
+                "tryInline":true,
+                "format":"Go away for {$aodshplug_001.aodshplug_act_goaway.time$} minutes because {$aodshplug_001.aodshplug_act_goaway.reason$}",
+                "data":[
+                    {
+                        "id":"aodshplug_001.aodshplug_act_goaway.time",
+                        "type":"text",
+                        "label":"Time (Minutes)",
+                        "default":"none"
+                    },
+                    {
+                        "id":"aodshplug_001.aodshplug_act_goaway.reason",
+                        "type":"text",
+                        "label":"Reason",
+                        "default":""
+                    }
+                ]
+            },
+            {
+                "id":"aodshplug_act_status",
+                "name":"Set Status Overlay State",
+                "prefix":"StreamHelper",
+                "type":"communicate",
+                "tryInline":true,
+                "format":"{$aodshplug_001.aodshplug_act_status.action$} the status {$aodshplug_001.aodshplug_act_status.status$}",
+                "data":[
+                    {
+                        "id":"aodshplug_001.aodshplug_act_status.action",
+                        "type":"choice",
+                        "label":"Action",
+                        "default":"",
+                        "valueChoices":["Add","Remove"]
+                    },
+                    {
+                        "id":"aodshplug_001.aodshplug_act_status.status",
+                        "type":"text",
+                        "label":"Status Text",
+                        "default":""
+                    }
+                ]
+            },
+            {
+                "id":"aodshplug_act_clearstatuses",
+                "name":"Clear Status Overlay States",
+                "prefix":"StreamHelper",
+                "type":"communicate"
+            },
+            {
+                "id":"aodshplug_act_timedstatus",
+                "name":"Add Timed Status Message",
+                "prefix":"StreamHelper",
+                "type":"communicate",
+                "tryInline":true,
+                "format":"Display {$aodshplug_001.aodshplug_act_timedstatus.message$} for {$aodshplug_001.aodshplug_act_timedstatus.time$} seconds",
+                "data":[
+                    {
+                        "id":"aodshplug_001.aodshplug_act_timedstatus.message",
+                        "type":"text",
+                        "label":"Message",
+                        "default":""
+                    },
+                    {   "id":"aodshplug_001.aodshplug_act_timedstatus.time",
+                        "type":"number",
+                        "label":"Time (Seconds)",
+                        "minValue":"1",
+                        "maxValue":"300",
+                        "default":"30"
+                    }
+                ]
+            },
+            {
+                "id":"aodshplug_act_micstate",
+                "name":"Send mic state",
+                "prefix":"StreamHelper",
+                "type":"communicate",
+                "tryInline":true,
+                "format":"Microphone is {$aodshplug_001.aodshplug_act_micstate.state$}",
+                "data":[
+                    {
+                        "id":"aodshplug_001.aodshplug_act_micstate.state",
+                        "type":"choice",
+                        "label":"Mic State",
+                        "default":"",
+                        "valueChoices":["On","Off"]
+                    }
+                ]
+            },
+            {
+                "id":"aodshplug_act_camstate",
+                "name":"Send cam state",
+                "prefix":"StreamHelper",
+                "type":"communicate",
+                "tryInline":true,
+                "format":"WebCam is {$aodshplug_001.aodshplug_act_camstate.state$}",
+                "data":[
+                    {
+                        "id":"aodshplug_001.aodshplug_act_camstate.state",
+                        "type":"choice",
+                        "label":"Cam State",
+                        "default":"",
+                        "valueChoices":["On","Off"]
+                    }
+                ]
+            },
+            {
+                "id":"aodshplug_act_sendmidinote",
+                "name":"Send MIDI Note",
+                "prefix":"StreamHelper",
+                "type":"communicate",
+                "tryInline":true,
+                "format":"Send note {$aodshplug_001.aodshplug_act_sendmidinote.note$} (Octave {$aodshplug_001.aodshplug_act_sendmidinote.octave$}) on channel {$aodshplug_001.aodshplug_act_sendmidinote.channel$} to device {$aodshplug_001.aodshplug_act_sendmidinote.device$}",
+                "data":[
+                    {
+                        "id":"aodshplug_001.aodshplug_act_sendmidinote.note",
+                        "type":"choice",
+                        "label":"Note",
+                        "default":"C",
+                        "valueChoices": ["C", "CS", "D", "DS", "E", "F", "FS", "G", "GS", "A", "AS", "B"]
+                    },
+                    {
+                        "id":"aodshplug_001.aodshplug_act_sendmidinote.octave",
+                        "type":"choice",
+                        "label":"Octave",
+                        "default":"1",
+                        "valueChoices": ["0", "1", "2", "3", "4", "5", "6", "7", "8"]
+                    },
+                    {
+                        "id":"aodshplug_001.aodshplug_act_sendmidinote.channel",
+                        "type":"choice",
+                        "label":"Channel",
+                        "default":"1",
+                        "valueChoices": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16"]
+                    },
+                    {
+                        "id":"aodshplug_001.aodshplug_act_sendmidinote.device",
+                        "type":"choice",
+                        "label":"Device",
+                        "default":"0",
+                        "valueChoices":["0", "1", "2"]
+                    }
+                ]
+            },
+            {
+                "id":"aodshplug_act_script",
+                "name":"Execute Script",
+                "prefix":"StreamHelper",
+                "type":"communicate",
+                "format":"Execute script 'request_{$aodshplug_001.aodshplug_act_script.scriptname$}' with params {$aodshplug_001.aodshplug_act_script.parameters$}",
+                "tryInline":true,
+                "data":[
+                    {
+                        "id":"aodshplug_001.aodshplug_act_script.scriptname",
+                        "type":"choice",
+                        "label":"Script Name",
+                        "default":"",
+                        "valueChoices":[]
+                    },
+                    {
+                        "id":"aodshplug_001.aodshplug_act_script.parameters",
+                        "type":"text",
+                        "label":"Script Parameters",
+                        "default":""
+                    }
+                ]
+            },
+            {
+                "id":"aodshplug_act_playsong",
+                "name":"Play Song",
+                "prefix":"StreamHelper",
+                "type":"communicate",
+                "format":"Play song provided by {$aodshplug_001.aodshplug_act_playsong.provider$}, in genre {$aodshplug_001.aodshplug_act_playsong.genre$} from album {$aodshplug_001.aodshplug_act_playsong.album$} - Song {$aodshplug_001.aodshplug_act_playsong.song$}",
+                "tryInline":true,
+                "data":[
+                    {
+                        "id":"aodshplug_001.aodshplug_act_playsong.provider",
+                        "type":"choice",
+                        "label":"Provider",
+                        "default":"",
+                        "valueChoices":[]
+                    },
+                    {
+                        "id":"aodshplug_001.aodshplug_act_playsong.genre",
+                        "type":"choice",
+                        "label":"Genre",
+                        "default":"",
+                        "valueChoices":[]
+                    },
+                    {
+                        "id":"aodshplug_001.aodshplug_act_playsong.album",
+                        "type":"choice",
+                        "label":"Album",
+                        "default":"",
+                        "valueChoices":[]
+                    },
+                    {
+                        "id":"aodshplug_001.aodshplug_act_playsong.song",
+                        "type":"choice",
+                        "label":"Song",
+                        "default":"",
+                        "valueChoices":[]
+                    }
+                ]
+            },
+            {
+                "id": "aodshplug_act_streammarker",
+                "name":"Record Stream Marker",
+                "prefix":"StreamHelper",
+                "type":"communicate",
+                "format":"Add stream marker record with label {$aodshplug_001.aodshplug_act_streammarker.label$}",
+                "tryInline":true,
+                "data":[
+                    {
+                        "id":"aodshplug_001.aodshplug_act_streammarker.label",
+                        "type":"text",
+                        "label":"Label",
+                        "default":"",
+                    },
+                ]
+            }
+        ],
+        "events":[
+            {
+                "id":"aodshplug_event_musicplaying",
+                "name":"On music playing",
+                "format":"When music playing is $val",
+                "type":"communicate",
+                "valueType":"choice",
+                "valueChoices": [
+                    "False", "True"
+                ],
+                "valueStateId":"aodshplug_state_musicplaying"
+            },
+            {
+                "id":"aodshplug_event_musicreqmixinchange",
+                "name":"On request mixin state changed",
+                "format":"When request mixin stated is $val",
+                "type":"communicate",
+                "valueType":"choice",
+                "valueChoices":["False", "True"],
+                "valueStateId":"aodshplug_state_musicreqmixinenabled"
+            }
+        ],
+        "connectors":[
+            {
+                "id":"aodshplug_con_musictrackpos",
+                "name":"Music Track Position",
+                "format":"Update StreamHelper Music Track Playback Position"
+            }
+        ],
+        "states":[
+            {
+                "id":"aodshplug_state_musicplaying",
+                "type":"choice",
+                "desc":"Music - Is playing",
+                "default":"False",
+                "valueChoices":["False", "True"]
+            },
+            {
+                "id":"aodshplug_state_musicreqmixinenabled",
+                "type":"choice",
+                "desc":"Music - Request mixin enabled",
+                "default": "False",
+                "valueChoices": [ "False", "True"]
+            },
+        ]
+    }
+    ],
+    "settings":[]
+}
