@@ -65,6 +65,7 @@ type
     procedure Execute; override;
   public
     constructor create(tpi: TBaseTouchPortalInterface; acon: TIdTCPConnection);
+    destructor Destroy; override;
   end;
 
   //------------------------------------------------------------------------------
@@ -99,6 +100,8 @@ type
     fHWND: HWND;
     fPluginId: string;
     fReconnectTimer: TTimer;
+
+    fClosePluginMessage: cardinal;
 
     // Socket events (for external handling of socket/connection related events
     fOnConnected: TNotifyEvent;
@@ -250,6 +253,7 @@ type
 implementation
 
 uses
+  VCL.Forms,
   IdException,
   IdExceptionCore,
   IdURI;
@@ -273,30 +277,43 @@ begin
   inherited create(false);
 end;
 
+destructor TTouchPortalInterfaceReader.destroy;
+begin
+
+  inherited;
+end;
+
 procedure TTouchPortalInterfaceReader.execute;
 var
   data: string;
 begin
   fTPI.logDbg(self, 'TTouchPortalInterfaceReader.execute - Started');
 
-  while (not terminated) and (fCon.Connected) do
+  while (not terminated) and (fCon.connected) do
   begin
     try
       data := fCon.ioHandler.readLn(#13#10, 1000);
+
       if (data <> '') then
       begin
         fTPI.logComs(self, format('TP >> %s', [data]));
-
         fTPI.handleData(self, data);
       end;
     except
       on e:EIdSilentException do
       begin
         // Silent indy exception just ignore it
+        fTPI.logDbg(self, format('Indy Silent Exception - (%s) %s', [e.className, e.message]));
       end;
       on e:EIdNotConnected do
       begin
         // This may be expected... do nothing
+        fTPI.logDbg(self, format('Indy Not Connected - (%s) %s', [e.className, e.message]));
+      end;
+      on e:EIdClosedSocket do
+      begin
+        // This may be expected... but WTAF is this not descended from a silent????
+        fTPI.logDbg(self, format('Indy Socket Closed - (%s) %s', [e.className, e.message]));
       end;
       on e:exception do
       begin
@@ -368,6 +385,7 @@ begin
 
   // Allocate a window handler (required for using TTimer)
   fHWND := AllocateHWnd(self.wndProc);
+  fClosePluginMessage := RegisterWindowMessage('TPI-ClosePlugin');
 
   fActive := false;
   fReconnectOnClose := true;
@@ -583,10 +601,17 @@ end;
 
 destructor TBaseTouchPortalInterface.Destroy;
 begin
+  fOnLog := nil;
+  fOnLogDbg := nil;
+  fOnLogComs := nil;
+  fOnLogError := nil;
+  fOnLogException := nil;
+
   stop;
 
   fShortConnectorIdentitiesById.free;
   fCurrentStates.free;
+
   fTP.free;
   fReconnectTimer.free;
 
@@ -633,12 +658,16 @@ begin
 
     try
       fReader.onTerminate := nil;
-
-      fReader.FreeOnTerminate := true;
       fReader.terminate;
+      fReader.waitFor;
+      fReader.free;
 
       logDbg(self, 'StopReader - Done');
     except
+      on e:EIdSilentException do
+      begin
+        // Indy Silent Exceptions - Do nothing
+      end;
       on e:Exception do
       begin
         logException(self, 'Exception shutting down reader', e);
@@ -806,6 +835,12 @@ var
   handled: boolean;
 begin
   handled := false;
+
+  if (msg.Msg = fClosePluginMessage) then
+  begin
+    self.handleClosePlugin;
+    handled := true;
+  end;
 
   if (handled) then
   begin
@@ -983,19 +1018,28 @@ begin
   begin
     fReconnectTimer.interval := 20000; // 20 Second delay (TP could be restarting)
     log(self, 'TP closed plug-in - Setting reconnect interval to 20 seconds');
+
   end;
 
-  stopReader;
-
-  try
-    logDbg(self, 'Closing socket');
-    fTP.Disconnect;
-  except
-    on e:exception do
-    begin
-      logException(self, 'Exception disconnecting from Touch Portal', e);
+  if (fTP.connected) then
+  begin
+    try
+      fTP.disconnect;
+    except
     end;
+
+    stopReader;
   end;
+
+//  try
+//    logDbg(self, 'Closing socket');
+//    fTP.Disconnect;
+//  except
+//    on e:exception do
+//    begin
+//      logException(self, 'Exception disconnecting from Touch Portal', e);
+//    end;
+//  end;
 
   fShortConnectorIdentitiesById.Clear;
 
@@ -1109,7 +1153,8 @@ begin
                 handleListChange(json);
               end else if (msgType = 'closePlugin') then
               begin
-                handleClosePlugin;
+                postMessage(fHWND, fClosePluginMessage, 0, 0);
+                // handleClosePlugin;
               end else
               begin
                 logError(self, format('Unknown message type - %s (%s)',
