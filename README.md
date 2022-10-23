@@ -142,7 +142,7 @@ The prototype for broadcast handlers is:-
 To link a handler to a broadcast message the **TPIBroadcast** attribute is used.
 
 ```
-  [TPIBroacast('pageChange')]
+  [TPIBroadcast('pageChange')]
   procedure handlePageChange(sender: TObject; eventName: string; broadcastMsg: TJSONValue);
 ```
 
